@@ -2,6 +2,7 @@
 const fs = require('fs');
 const express = require('express');
 const proxy = require('express-http-proxy');
+const request = require('request');
 const register = require('prom-client').register;
 const Counter = require('prom-client').Counter;
 
@@ -36,9 +37,15 @@ server.use('/proxy/episodes/:number', proxy(config[EpisodeHostKey], {
         const episodeFileExtension = config[EpisodeFileExtensionKey];
         const episodeNumber = req.params['number'];
 
-        if (req.method === 'GET') counterDownloads.inc({'episode': episodeNumber});
+        const fullEpisodePath = (episodeBasePath + episodeBaseName + episodeNumber + episodeFileExtension);
 
-        return (episodeBasePath + episodeBaseName + episodeNumber + episodeFileExtension);
+        if (req.method === 'GET') {
+            request.head(config[EpisodeHostKey] + fullEpisodePath, (error, response) => {
+                if (response.statusCode === 200) counterDownloads.inc({'episode': episodeNumber});
+            });
+        }
+
+        return fullEpisodePath;
     }
 }));
 
