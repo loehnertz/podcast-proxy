@@ -2,5 +2,6 @@
   "episodeHost": "",
   "episodeBasePath": "",
   "episodeBaseName": "",
-  "episodeFileExtension": ""
+  "episodeFileExtension": "",
+  "port": 3015
 }
