@@ -14,6 +14,7 @@ const EpisodeBasePathKey = 'episodeBasePath';
 const EpisodeBaseNameKey = 'episodeBaseName';
 const EpisodeFileExtensionKey = 'episodeFileExtension';
 
+
 // Initializations
 const config = JSON.parse(fs.readFileSync('config.json'));
 
@@ -39,7 +40,7 @@ server.use('/proxy/episodes/:number', proxy(config[EpisodeHostKey], {
 
         const fullEpisodePath = (episodeBasePath + episodeBaseName + episodeNumber + episodeFileExtension);
 
-        if (req.method === 'GET') {
+        if (req.method === 'GET' && !req.header('range')) {
             request.head(config[EpisodeHostKey] + fullEpisodePath, (error, response) => {
                 if (response.statusCode === 200) counterDownloads.inc({'episode': episodeNumber});
             });
