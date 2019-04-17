@@ -42,7 +42,7 @@ server.use('/proxy/episodes/:number', proxy(config[EpisodeHostKey], {
 
         request.head(config[EpisodeHostKey] + fullEpisodePath, (error, response) => {
             let requestedEpisodeExists = response.statusCode === 200;
-            let requestedEpisodeByteSize = response.headers['content-length'].toString();
+            let requestedEpisodeByteSize = String(response.headers['content-length']);
 
             if (requestedEpisodeExists && req.method === 'GET' && (!req.header('range') || req.header('range').includes(requestedEpisodeByteSize))) {
                 counterDownloads.inc({'episode': episodeNumber});
