@@ -40,18 +40,14 @@ server.use('/proxy/episodes/:number', proxy(config[EpisodeHostKey], {
 
         const fullEpisodePath = (episodeBasePath + episodeBaseName + episodeNumber + episodeFileExtension);
 
-        let requestedEpisodeExists = false;
-        let requestedEpisodeByteSize = NaN.toString();
         request.head(config[EpisodeHostKey] + fullEpisodePath, (error, response) => {
-            if (response.statusCode === 200) {
-                requestedEpisodeExists = true;
-                requestedEpisodeByteSize = response.headers['content-length'].toString();
+            let requestedEpisodeExists = response.statusCode === 200;
+            let requestedEpisodeByteSize = response.headers['content-length'].toString();
+
+            if (requestedEpisodeExists && req.method === 'GET' && (!req.header('range') || req.header('range').includes(requestedEpisodeByteSize))) {
+                counterDownloads.inc({'episode': episodeNumber});
             }
         });
-
-        if (requestedEpisodeExists && req.method === 'GET' && (!req.header('range') || req.header('range').includes(requestedEpisodeByteSize))) {
-            counterDownloads.inc({'episode': episodeNumber});
-        }
 
         return fullEpisodePath;
     }
@@ -65,5 +61,4 @@ server.get('/metrics', (req, res) => {
 
 // Startup
 console.log('Server listening on port: ' + config[PortKey]);
-
 server.listen(config[PortKey]);
