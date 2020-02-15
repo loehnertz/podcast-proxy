@@ -36,7 +36,7 @@ server.use('/proxy/episodes/:number', proxy(config[EpisodeHostKey], {
         const episodeBasePath = config[EpisodeBasePathKey];
         const episodeBaseName = config[EpisodeBaseNameKey];
         const episodeFileExtension = config[EpisodeFileExtensionKey];
-        const episodeNumber = req.params['number'];
+        const episodeNumber = req.params['number'].replace(episodeFileExtension, '');
 
         const fullEpisodePath = (episodeBasePath + episodeBaseName + episodeNumber + episodeFileExtension);
 
